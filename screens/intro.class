@@ -1,0 +1,62 @@
+package com.ygames.ysoccer.screens;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.ygames.ysoccer.framework.GLGame;
+import com.ygames.ysoccer.framework.GLScreen;
+import com.ygames.ysoccer.gui.TextBox;
+import com.ygames.ysoccer.gui.Widget;
+import java.util.Arrays;
+import java.util.Objects;
+
+public class Intro extends GLScreen {
+  public Intro(GLGame game) {
+    super(game);
+    this.usesMouse = false;
+    game.disableMouse();
+    Gdx.input.setInputProcessor((InputProcessor)new IntroInputProcessor());
+    BitmapFont font = new BitmapFont(true);
+    String[] lines = { "YSoccer 19, Copyright (C) 2019", "by Massimo Modica, Daniele Giannarini, Marco Modica", "", "YSoccer comes with ABSOLUTELY NO WARRANTY; for details press 'W'.", "This is free software, and you are welcome to redistribute it", "under certain conditions; press 'C' for details.", "", "", "Press any key or button to continue" };
+    Objects.requireNonNull(game.gui);
+    TextBox textBox = new TextBox(font, Arrays.asList(lines), 1280 / 2, 270);
+    this.widgets.add(textBox);
+  }
+  
+  public void render(float delta) {
+    super.render(delta);
+    if (this.widgetEvent == Widget.Event.FIRE1_UP || this.widgetEvent == Widget.Event.FIRE2_UP)
+      setMainMenu(); 
+  }
+  
+  private class IntroInputProcessor extends InputAdapter {
+    private IntroInputProcessor() {}
+    
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+      Intro.this.setMainMenu();
+      return true;
+    }
+    
+    public boolean keyUp(int keycode) {
+      switch (keycode) {
+        case 51:
+          Intro.this.game.setScreen((Screen)new Warranty(Intro.this.game));
+          return true;
+        case 31:
+          Intro.this.game.setScreen((Screen)new Copying(Intro.this.game));
+          return true;
+      } 
+      Intro.this.setMainMenu();
+      return true;
+    }
+  }
+  
+  private void setMainMenu() {
+    Gdx.input.setInputProcessor(null);
+    this.game.enableMouse();
+    this.game.menuMusic.setMode(this.game.settings.musicMode);
+    this.game.setScreen((Screen)new Main(this.game));
+  }
+}
